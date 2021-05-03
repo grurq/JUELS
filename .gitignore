@@ -1,3 +1,8 @@
+# DXLib ignore by grurq
+/sources/
+/exe/
+
+Log.txt
 # Prerequisites
 *.d
 
@@ -50,3 +55,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# 記載漏れ？
+*.suo
+*.db

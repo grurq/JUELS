@@ -1,0 +1,18 @@
+http://pansound.com/panicpumpkin/index.html
+
+BGM.mp3	たまごからひょっこり
+http://pansound.com/panicpumpkin/music/mp3/BGM039-070616-tamagokarahyokkori-mp3.mp3
+jingle_GAMEOVER.wav	クリア３
+http://pansound.com/panicpumpkin/music/wav/ME007-090401-clear03-wav.wav
+
+システム音セット(.wav)
+http://pansound.com/panicpumpkin/music/se/system.zip
+se_SORT_U	カーソル（柔らかい）
+se_SORT_D	カーソル（柔らかい）2
+se_PAUSE	決定＿大決定（ファンタジー系）2
+se_MOVE	カーソル（固い）
+se_ATTOUCHED	カーソル（柔らかい）2
+
+抽象的な音セット
+http://pansound.com/panicpumpkin/music/se/chuushou.zip
+se_DROP.wav	アイテム＿アイテム獲得小（拾う）.wav
