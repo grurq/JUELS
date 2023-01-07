@@ -26,7 +26,7 @@
 
 
 #define defspeed	1600
-#define decwait		50
+#define decwait		75
 
 
 // グローバル変数定義
