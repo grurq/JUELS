@@ -1,6 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "DxLib.h"
 #include "test.h"
-
 
 
 
@@ -151,6 +151,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		WaitTimer(2500);
 
 		WaitKey();
+		ranking();
+		
 	} while (true);
 
 		DxLib_End();

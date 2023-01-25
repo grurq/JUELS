@@ -1,6 +1,19 @@
-
+#define _CRT_SECURE_NO_WARNINGS
 #pragma once
 
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#define DATA 10
+#define NAMELENGTH 10
+
+typedef struct {
+	char name[NAMELENGTH];
+	int score;
+	time_t date;
+}scorelog;
 /* デフォルトウィンドウサイズは640*480 */
 
 
@@ -27,6 +40,9 @@
 
 #define defspeed	1600
 #define decwait		75
+
+#define DATA 10
+#define NAMELENGTH 10
 
 
 // グローバル変数定義
@@ -71,6 +87,167 @@ int mapseek_r(int x, int y);
 int maps_fall(void);
 int maps_appear(void);
 int maps_draw(int flag);
+
+int swapscore(scorelog* a, scorelog* b) {
+	scorelog c;
+	c.name[0] = '\0';
+
+	strcpy(c.name, a->name);
+	c.score = a->score;
+	c.date = a->date;
+
+	strcpy(a->name, b->name);
+	a->score = b->score;
+	a->date = b->date;
+
+	strcpy(b->name, c.name);
+	b->score = c.score;
+	b->date = c.date;
+
+	return 0;
+}
+int putnull(char doc[], int max) {
+	for (int i = 0; i < max; i++) {
+		if (doc[i] == '\n')doc[i] = '\0';
+	}
+
+	return 0;
+}
+int scoresort(scorelog scores[], int max) {
+	int h = 0;
+	int i = 0;
+	for (h = 0; h < max - 1; h++) {
+		for (i = max - 1; i > h; i--) {
+			if (scores[i - 1].score < scores[i].score) {
+				//printf("%d\t%d\n", scores[i - 1].score, scores[i].score);
+				swapscore(&scores[i - 1], &scores[i]);
+			}
+		}
+		
+	}
+	return 0;
+
+}
+int putranking(scorelog scores[]) {
+	int i;
+	DrawBox(0, 20, 641, 461, daidai, TRUE);
+	DrawBox(2, 22, 638, 458, kuro, TRUE);
+	DrawFormatString(200, 60, siro, "JUELS Best Scores");
+	for (i = 0; i < DATA; i++) {
+		DrawFormatString(100, 80 + 20 * i, siro, "%2d %10s %10d %s", i + 1, scores[i].name, scores[i].score, ctime(&scores[i].date));
+	}
+
+	return 0;
+}
+
+int drawchar(int x, int y, char chara) {
+	DrawBox(x, y, 10 + x, 20+y , kuro, TRUE);
+	DrawFormatString(x, y, siro, "%c", chara);
+	return 0;
+}
+int insertrank(char* name) {
+	int i;
+	int key = 0;
+	DrawFormatString(100,300, siro, "Input your name:Z-key for decide");
+	for (i = 0; i < 6; i++) {
+		drawchar(10 + 10 * i, 320, name[i]);
+	}
+	i = 0;
+	while (key != PAD_INPUT_1) {
+		DrawFormatString(100+10*i, 340, siro, "^", name[i]);
+		key = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+		if (key & PAD_INPUT_UP) {
+			if (name[i] == 'A') { name[i] = ' '; }
+			else if (name[i] == ' ') { name[i] = 'Z'; }
+			else { name[i] -= 1; }
+			drawchar(100 + 10 * i, 320, name[i]);
+			
+
+		}
+		if (key & PAD_INPUT_DOWN) {
+			if (name[i] == 'Z') { name[i] = ' '; }
+			else if (name[i] == ' ') { name[i] = 'A'; }
+			else { name[i] += 1; }
+			drawchar(100 + 10 * i, 320, name[i]);
+
+
+		}
+		if (key & PAD_INPUT_LEFT && i > 0) {
+			drawchar(100 + 10 * i, 340, ' ');
+			i--;
+			drawchar(100 + 10 * i, 340, '^');
+		}
+		if (key & PAD_INPUT_RIGHT && i < 5) {
+			drawchar(100 + 10 * i, 340, ' ');
+			i++;
+			drawchar(100 + 10 * i, 340, '^');
+		}
+		WaitTimer(50);
+	}
+	name[6] = '\0';
+
+	return 0;
+}
+int ranking(void) {
+	int i, h;
+	scorelog scores[DATA + 1];
+	int insertarray = -1;
+	time_t randomseed;
+	srand((unsigned int)time(&randomseed));
+	FILE* fp;
+	fp = fopen("score.dat", "rb");
+	if (fp == NULL) {
+		for (i = 0; i < DATA; i++) {
+			strcpy(scores[i].name, " GRURQ");
+			scores[i].score = 30000 - 3000 * i;
+			scores[i].date = time(NULL);
+
+		}
+		fp = fopen("score.dat", "wb");
+		for (i = 0; i < DATA; i++) {
+			fwrite(&scores[i], sizeof(scores[i]), 1, fp);
+		}
+		fclose(fp);
+	}
+	else {
+		for (i = 0; i < DATA; i++)fread(&scores[i], sizeof(scores[i]), 1, fp);
+		fclose(fp);
+	}
+	scoresort(scores, DATA);
+
+	strcpy(scores[DATA].name, "      ");
+	scores[DATA].score = score;
+	scores[DATA].date = time(NULL);
+	for (i = 0; i < DATA; i++) {
+
+		if (scores[DATA].score >= scores[i].score) {
+			insertarray = i;
+			for (h = DATA; i < h; h--) {
+				swapscore(&scores[h], &scores[h - 1]);
+			}
+		}
+				}
+	if (insertarray >= 0) {
+		putranking(scores);
+		insertrank(scores[insertarray].name);
+		putranking(scores);
+		
+		fp = fopen("score.dat", "wb");
+		for (i = 0; i < DATA; i++) {
+			fwrite(&scores[i], sizeof(scores[i]), 1, fp);
+		}
+		fclose(fp);
+
+		WaitKey();
+	}
+	else {
+		putranking(scores);
+		WaitKey();
+		
+		
+	}
+	return 0;
+}
 
 
 
@@ -136,6 +313,7 @@ int opening(void) {
 	return 0;
 }
 
+
 int docs_sc(int words) {
 	/*
 	スコア及びヘルプウィンドウ
@@ -151,7 +329,7 @@ int docs_sc(int words) {
 		DrawBox(354, 62, 510, 218, kuro, TRUE);
 		DrawString(377, 135, "←→:move\nZ X :swap\n↓  :fall\nESC :pause", siro);
 		if (score > hiscore) hiscore = score;
-			DrawFormatString(367, 75, siro, "hiscore:%7d\n  score:%7d\n  speed:%7d",hiscore, score, defspeed - waitdef);	
+			DrawFormatString(367, 75, siro, "    JUELS\n  score:%7d\n  speed:%7d", score, defspeed - waitdef);	
 		break;
 	case 2:
 		DrawBox(354, 62, 510, 218, kuro, TRUE);
